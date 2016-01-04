@@ -91,11 +91,11 @@ function ptrace{T}(rho::AbstractMatrix{T}, dims, which::Int)
     result
 end
 
-function ptrace(rho::AbstractMatrix)
+function ptrace(rho::AbstractMatrix, which::Int=2)
     size(rho, 1) % 2 == 0 || throw(DomainError())
 
     s = div(size(rho, 1), 2)
-    ptrace(rho, (s, s), 2)
+    ptrace(rho, (s, s), which)
 end
 
 """

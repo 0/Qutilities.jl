@@ -44,6 +44,9 @@ let M = reshape(1.:16., 4, 4)
     @test ptrace(M, (4, 1), 2) == M
     @test ptranspose(M, (4, 1), 2) == M
 
+    @test ptrace(M, 1) == ptrace(M, (2, 2), 1)
+    @test ptrace(M, 2) == ptrace(M, (2, 2), 2)
+
     @test ptrace(M) == ptrace(M, (2, 2), 2)
     @test ptranspose(M) == ptranspose(M, (2, 2), 2)
 end
