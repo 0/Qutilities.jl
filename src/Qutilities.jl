@@ -166,7 +166,6 @@ function S_renyi(rho::AbstractMatrix, alpha::Real=2)
     LOG(sum(E.^alpha)) / (1 - alpha)
 end
 
-S_renyi(rho::AbstractMatrix) = S_renyi(rho, 2)
 
 """
 Wootters spin-flip operation for two qubits in the standard basis.
