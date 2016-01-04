@@ -90,6 +90,14 @@ let
 end
 
 
+### mutinf
+
+let rho = diagm([3, 2, 1, 2]) / 8.
+    @test_approx_eq mutinf(rho) (1.5 - 5. * log2(5.) / 8.)
+    @test_approx_eq mutinf(rho, S_renyi) (1. + 2. * log2(3.) - log2(17.))
+end
+
+
 ### spinflip, concurrence, concurrence_lb, formation, negativity
 
 let rho = reshape(1.:16., 4, 4)

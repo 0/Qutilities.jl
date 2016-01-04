@@ -40,6 +40,8 @@ ptranspose(rho)
 @printf "%f" S_renyi(rho, Inf)
 #-> 0.415037
 
+@printf "%f" mutinf(rho)
+#-> 0.938722
 @printf "%f" concurrence(rho)
 #-> 0.500000
 @printf "%f" formation(rho)

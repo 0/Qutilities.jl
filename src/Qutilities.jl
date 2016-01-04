@@ -5,6 +5,7 @@ export
     concurrence,
     concurrence_lb,
     formation,
+    mutinf,
     negativity,
     ptrace,
     ptranspose,
@@ -166,6 +167,12 @@ function S_renyi(rho::AbstractMatrix, alpha::Real=2)
     LOG(sum(E.^alpha)) / (1 - alpha)
 end
 
+"""
+Mutual information.
+"""
+function mutinf(rho::AbstractMatrix, S::Function=S_vn)
+    S(ptrace(rho, 1)) + S(ptrace(rho, 2)) - S(rho)
+end
 
 """
 Wootters spin-flip operation for two qubits in the standard basis.
