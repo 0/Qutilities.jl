@@ -53,6 +53,14 @@ ptranspose(rho)
 ```
 
 
+## Testing
+
+Run all the tests:
+```
+JULIA_LOAD_PATH=src julia --color=yes test/runtests.jl
+```
+
+
 ## License
 
 Provided under the terms of the MIT license.
