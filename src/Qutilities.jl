@@ -19,7 +19,7 @@ export
 
 
 # All logarithms are base 2.
-LOG = log2
+const LOG = log2
 
 """
 Make Hermitian, but carefully.
@@ -55,9 +55,9 @@ shannon(xs) = -sum([x * LOG(x) for x in xs[xs .> 0]])
 
 
 # Single-qubit Pauli matrices.
-sigma_x = [[0, 1] [1, 0]]
-sigma_y = [[0, im] [-im, 0]]
-sigma_z = [[1, 0] [0, -1]]
+const sigma_x = [[0, 1] [1, 0]]
+const sigma_y = [[0, im] [-im, 0]]
+const sigma_z = [[1, 0] [0, -1]]
 
 """
 Partial trace.
