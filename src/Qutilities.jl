@@ -35,7 +35,7 @@ function hermitize(rho::AbstractMatrix)
 
     # Make the diagonal strictly real.
     rho_H = copy(rho)
-    for i=1:size(rho_H, 1)
+    for i in 1:size(rho_H, 1)
         rho_H[i, i] = real(rho_H[i, i])
     end
 
@@ -51,13 +51,13 @@ nonneg(A::AbstractArray) = map(nonneg, A)
 """
 Shannon entropy.
 """
-shannon(xs) = -sum([x * LOG(x) for x in xs[xs .> 0]])
+shannon(xs::AbstractVector) = -sum([x * LOG(x) for x in xs if x > 0])
 
 
 # Single-qubit Pauli matrices.
-const sigma_x = [[0, 1] [1, 0]]
-const sigma_y = [[0, im] [-im, 0]]
-const sigma_z = [[1, 0] [0, -1]]
+const sigma_x = [[0.0, 1.0] [1.0, 0.0]]
+const sigma_y = [[0.0, im] [-im, 0.0]]
+const sigma_z = [[1.0, 0.0] [0.0, -1.0]]
 
 """
 Partial trace.
@@ -69,20 +69,20 @@ function ptrace{T}(rho::AbstractMatrix{T}, dims, which::Int)
     # Only square matrices are supported.
     size(rho) == (prod(dims), prod(dims)) || throw(DomainError())
 
-    size_before = prod(dims[1:which-1])
+    size_before = prod(dims[1:(which-1)])
     size_at = dims[which]
-    size_after = prod(dims[which+1:end])
+    size_after = prod(dims[(which+1):end])
 
     result = zeros(T, size_before*size_after, size_before*size_after)
-    for i1=1:size_before
-        for j1=1:size_before
-            for k=1:size_at
-                for i2=1:size_after
-                    for j2=1:size_after
-                        row1 = size_after * (i1 - 1) + i2
-                        col1 = size_after * (j1 - 1) + j2
-                        row2 = size_at * size_after * (i1 - 1) + size_after * (k - 1) + i2
-                        col2 = size_at * size_after * (j1 - 1) + size_after * (k - 1) + j2
+    for i1 in 1:size_before
+        for j1 in 1:size_before
+            for k in 1:size_at
+                for i2 in 1:size_after
+                    for j2 in 1:size_after
+                        row1 = size_after*(i1-1) + i2
+                        col1 = size_after*(j1-1) + j2
+                        row2 = size_at*size_after*(i1-1) + size_after*(k-1) + i2
+                        col2 = size_at*size_after*(j1-1) + size_after*(k-1) + j2
                         result[row1, col1] += rho[row2, col2]
                     end
                 end
@@ -109,21 +109,21 @@ function ptranspose(rho::AbstractMatrix, dims, which::Int)
     # Only square matrices are supported.
     size(rho) == (prod(dims), prod(dims)) || throw(DomainError())
 
-    size_before = prod(dims[1:which-1])
+    size_before = prod(dims[1:(which-1)])
     size_at = dims[which]
-    size_after = prod(dims[which+1:end])
+    size_after = prod(dims[(which+1):end])
 
     result = similar(rho)
-    for i1=1:size_before
-        for j1=1:size_before
-            for i2=1:size_at
-                for j2=1:size_at
-                    for i3=1:size_after
-                        for j3=1:size_after
-                            row1 = size_at * size_after * (i1 - 1) + size_after * (i2 - 1) + i3
-                            col1 = size_at * size_after * (j1 - 1) + size_after * (j2 - 1) + j3
-                            row2 = size_at * size_after * (i1 - 1) + size_after * (j2 - 1) + i3
-                            col2 = size_at * size_after * (j1 - 1) + size_after * (i2 - 1) + j3
+    for i1 in 1:size_before
+        for j1 in 1:size_before
+            for i2 in 1:size_at
+                for j2 in 1:size_at
+                    for i3 in 1:size_after
+                        for j3 in 1:size_after
+                            row1 = size_at*size_after*(i1-1) + size_after*(i2-1) + i3
+                            col1 = size_at*size_after*(j1-1) + size_after*(j2-1) + j3
+                            row2 = size_at*size_after*(i1-1) + size_after*(j2-1) + i3
+                            col2 = size_at*size_after*(j1-1) + size_after*(i2-1) + j3
                             result[row1, col1] = rho[row2, col2]
                         end
                     end
@@ -204,7 +204,7 @@ function concurrence(rho::AbstractMatrix)
         warn("Negative eigenvalues: $(minimum(real(E)))")
     end
     F = E |> real |> nonneg |> sqrt |> sort
-    nonneg(F[end] - sum(F[1:end-1]))
+    nonneg(F[end] - sum(F[1:(end-1)]))
 end
 
 """
@@ -216,7 +216,7 @@ mixed quantum states. Physical Review Letters, 98(14), 140505.
 function concurrence_lb(rho::AbstractMatrix)
     size(rho) == (4, 4) || throw(DomainError())
 
-    2. * (purity(rho) - purity(ptrace(rho))) |> nonneg |> sqrt
+    2.0*(purity(rho) - purity(ptrace(rho))) |> nonneg |> sqrt
 end
 
 """
@@ -225,7 +225,7 @@ Entanglement of formation for two qubits (given the concurrence).
 Ref: Wootters, W. K. (1998). Entanglement of formation of an arbitrary state of
 two qubits. Physical Review Letters, 80(10), 2245.
 """
-formation(C::Real) = binent(0.5 * (1. + sqrt(1. - C^2)))
+formation(C::Real) = binent(0.5 * (1.0 + sqrt(1.0 - C^2)))
 formation(rho::AbstractMatrix) = rho |> concurrence |> formation
 
 """
