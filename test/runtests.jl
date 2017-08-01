@@ -76,7 +76,7 @@ end
         @test S_renyi(rho2, 0) == 1.0
 
         @test S_vn(rho1) == 2.0
-        @test S_vn(rho2) == -sum(eigs2 .* log2(eigs2))
+        @test S_vn(rho2) == -sum(eigs2 .* log2.(eigs2))
 
         @test S_renyi(rho1) == 2.0
         @test S_renyi(rho2) == -log2(sum(eigs2.^2))

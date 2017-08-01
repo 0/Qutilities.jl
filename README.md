@@ -2,7 +2,7 @@
 
 Assorted utilities for quantum information.
 
-Tested with Julia 0.5.
+Tested with Julia 0.6.
 
 
 ## Installation
@@ -13,43 +13,46 @@ Tested with Julia 0.5.
 ## Examples
 
 ```julia
-using Qutilities
+julia> using Qutilities
 
-rho = [[1, 0, 0, 0] [0, 3, 3, 0] [0, 3, 3, 0] [0, 0, 0, 1]]/8.0
-#-> 0.125  0.0    0.0    0.0
-#   0.0    0.375  0.375  0.0
-#   0.0    0.375  0.375  0.0
-#   0.0    0.0    0.0    0.125
+julia> rho = [[1, 0, 0, 0] [0, 3, 3, 0] [0, 3, 3, 0] [0, 0, 0, 1]]/8.0
+4×4 Array{Float64,2}:
+ 0.125  0.0    0.0    0.0
+ 0.0    0.375  0.375  0.0
+ 0.0    0.375  0.375  0.0
+ 0.0    0.0    0.0    0.125
 
-ptrace(rho)
-#-> 0.5  0.0
-#   0.0  0.5
-ptranspose(rho)
-#-> 0.125  0.0    0.0    0.375
-#   0.0    0.375  0.0    0.0
-#   0.0    0.0    0.375  0.0
-#   0.375  0.0    0.0    0.125
+julia> ptrace(rho)
+2×2 Array{Float64,2}:
+ 0.5  0.0
+ 0.0  0.5
+julia> ptranspose(rho)
+4×4 Array{Float64,2}:
+ 0.125  0.0    0.0    0.375
+ 0.0    0.375  0.0    0.0
+ 0.0    0.0    0.375  0.0
+ 0.375  0.0    0.0    0.125
 
-@printf "%f" purity(rho)
-#-> 0.593750
+julia> purity(rho)
+0.59375
 
-@printf "%f" S_renyi(rho, 0)
-#-> 2.000000
-@printf "%f" S_vn(rho)
-#-> 1.061278
-@printf "%f" S_renyi(rho)
-#-> 0.752072
-@printf "%f" S_renyi(rho, Inf)
-#-> 0.415037
+julia> S_renyi(rho, 0)
+2.0
+julia> S_vn(rho)
+1.061278124459133
+julia> S_renyi(rho)
+0.7520724865564145
+julia> S_renyi(rho, Inf)
+0.4150374992788438
 
-@printf "%f" mutinf(rho)
-#-> 0.938722
-@printf "%f" concurrence(rho)
-#-> 0.500000
-@printf "%f" formation(rho)
-#-> 0.354579
-@printf "%f" negativity(rho)
-#-> 0.584963
+julia> mutinf(rho)
+0.9387218755408671
+julia> concurrence(rho)
+0.5
+julia> formation(rho)
+0.35457890266527003
+julia> negativity(rho)
+0.5849625007211562
 ```
 
 

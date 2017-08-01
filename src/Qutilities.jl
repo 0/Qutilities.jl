@@ -28,7 +28,7 @@ function hermitize(rho::AbstractMatrix)
     # Only square matrices are supported.
     size(rho, 1) == size(rho, 2) || throw(DomainError())
 
-    err = maximum(abs(rho - rho'))
+    err = maximum(abs.(rho - rho'))
     if err > 1e-12
         warn("Matrix is not Hermitian: $(err)")
     end
@@ -45,8 +45,7 @@ end
 """
 Change negative values to zero.
 """
-nonneg(A::Real) = A < 0 ? zero(A) : A
-nonneg(A::AbstractArray) = map(nonneg, A)
+nonneg(x::Real) = x < 0 ? zero(x) : x
 
 """
 Shannon entropy.
@@ -203,7 +202,7 @@ function concurrence(rho::AbstractMatrix)
     if any(real(E) .< -1e-12)
         warn("Negative eigenvalues: $(minimum(real(E)))")
     end
-    F = E |> real |> nonneg |> sqrt |> sort
+    F = sort(sqrt.(nonneg.(real(E))))
     nonneg(F[end] - sum(F[1:(end-1)]))
 end
 
