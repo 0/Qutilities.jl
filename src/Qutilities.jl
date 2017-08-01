@@ -22,7 +22,9 @@ export
 const LOG = log2
 
 """
-Make Hermitian, but carefully.
+    hermitize(rho::AbstractMatrix)
+
+Make `rho` Hermitian, but carefully.
 """
 function hermitize(rho::AbstractMatrix)
     # Only square matrices are supported.
@@ -43,12 +45,16 @@ function hermitize(rho::AbstractMatrix)
 end
 
 """
-Change negative values to zero.
+    nonneg(x::Real)
+
+`x` if `x` is non-negative; zero if `x` is negative.
 """
 nonneg(x::Real) = x < 0 ? zero(x) : x
 
 """
-Shannon entropy.
+    shannon(xs::AbstractVector)
+
+Shannon entropy of `xs`.
 """
 shannon(xs::AbstractVector) = -sum([x * LOG(x) for x in xs if x > 0])
 
@@ -59,10 +65,9 @@ const sigma_y = [[0.0, im] [-im, 0.0]]
 const sigma_z = [[1.0, 0.0] [0.0, -1.0]]
 
 """
-Partial trace.
+    ptrace{T}(rho::AbstractMatrix{T}, dims, which::Int)
 
-If no details are provided, it splits rho into two halves and traces over the
-second half.
+Partial trace of `rho` along dimension `which` from `dims`.
 """
 function ptrace{T}(rho::AbstractMatrix{T}, dims, which::Int)
     # Only square matrices are supported.
@@ -91,6 +96,13 @@ function ptrace{T}(rho::AbstractMatrix{T}, dims, which::Int)
     result
 end
 
+"""
+    ptrace(rho::AbstractMatrix, which::Int=2)
+
+Partial trace of `rho` along dimension `which`.
+
+`rho` is split into halves and the trace is over the second half by default.
+"""
 function ptrace(rho::AbstractMatrix, which::Int=2)
     size(rho, 1) % 2 == 0 || throw(DomainError())
 
@@ -99,10 +111,9 @@ function ptrace(rho::AbstractMatrix, which::Int=2)
 end
 
 """
-Partial transpose.
+    ptranspose(rho::AbstractMatrix, dims, which::Int)
 
-If no details are provided, it splits rho into two halves and transposes the
-second half.
+Partial transpose of `rho` along dimension `which` from `dims`.
 """
 function ptranspose(rho::AbstractMatrix, dims, which::Int)
     # Only square matrices are supported.
@@ -133,6 +144,14 @@ function ptranspose(rho::AbstractMatrix, dims, which::Int)
     result
 end
 
+"""
+    ptranspose(rho::AbstractMatrix, which::Int=2)
+
+Partial transpose of `rho` along dimension `which`.
+
+`rho` is split into halves and the transpose is over the second half by
+default.
+"""
 function ptranspose(rho::AbstractMatrix, which::Int=2)
     size(rho, 1) % 2 == 0 || throw(DomainError())
 
@@ -141,24 +160,33 @@ function ptranspose(rho::AbstractMatrix, which::Int=2)
 end
 
 """
-Binary entropy.
+    binent(x::Real)
+
+Binary entropy of `x`.
 """
 binent(x::Real) = shannon([x, one(x) - x])
 
 """
-Purity.
+    purity(rho::AbstractMatrix)
+
+Purity of `rho`.
 """
 purity(rho::AbstractMatrix) = rho^2 |> trace |> real
 
 """
-Von Neumann entropy.
+    S_vn(rho::AbstractMatrix)
+
+Von Neumann entropy of `rho`.
 """
 S_vn(rho::AbstractMatrix) = rho |> hermitize |> eigvals |> shannon
 
 """
-Rényi entropy.
+    S_renyi(rho::AbstractMatrix, alpha::Real=2)
 
-The alpha parameter may have any value on [0, Inf] except 1. It defaults to 2.
+Order `alpha` Rényi entropy of `rho`.
+
+The `alpha` parameter may have any value on the interval `[0, Inf]` except 1.
+It defaults to 2.
 """
 function S_renyi(rho::AbstractMatrix, alpha::Real=2)
     E = rho |> hermitize |> eigvals
@@ -167,14 +195,19 @@ function S_renyi(rho::AbstractMatrix, alpha::Real=2)
 end
 
 """
-Mutual information.
+    mutinf(rho::AbstractMatrix, S::Function=S_vn)
+
+Mutual information of `rho` using the entropy function `S`.
 """
 function mutinf(rho::AbstractMatrix, S::Function=S_vn)
     S(ptrace(rho, 1)) + S(ptrace(rho, 2)) - S(rho)
 end
 
 """
-Wootters spin-flip operation for two qubits in the standard basis.
+    spinflip(rho::AbstractMatrix)
+
+Wootters spin-flip operation for two qubits in the mixed state `rho` in the
+standard basis.
 
 Ref: Wootters, W. K. (1998). Entanglement of formation of an arbitrary state of
 two qubits. Physical Review Letters, 80(10), 2245.
@@ -187,7 +220,9 @@ function spinflip(rho::AbstractMatrix)
 end
 
 """
-Concurrence of a mixed state for two qubits in the standard basis.
+    concurrence(rho::AbstractMatrix)
+
+Concurrence of a mixed state `rho` for two qubits in the standard basis.
 
 Ref: Wootters, W. K. (1998). Entanglement of formation of an arbitrary state of
 two qubits. Physical Review Letters, 80(10), 2245.
@@ -207,7 +242,10 @@ function concurrence(rho::AbstractMatrix)
 end
 
 """
-Lower bound on the concurrence for two qubits in the standard basis.
+    concurrence_lb(rho::AbstractMatrix)
+
+Lower bound on the concurrence for two qubits in the mixed state `rho` in the
+standard basis.
 
 Ref: Mintert, F., & Buchleitner, A. (2007). Observable entanglement measure for
 mixed quantum states. Physical Review Letters, 98(14), 140505.
@@ -219,16 +257,30 @@ function concurrence_lb(rho::AbstractMatrix)
 end
 
 """
-Entanglement of formation for two qubits (given the concurrence).
+    formation(C::Real)
+
+Entanglement of formation for two qubits with concurrence `C`.
 
 Ref: Wootters, W. K. (1998). Entanglement of formation of an arbitrary state of
 two qubits. Physical Review Letters, 80(10), 2245.
 """
 formation(C::Real) = binent(0.5 * (1.0 + sqrt(1.0 - C^2)))
+
+"""
+    formation(rho::AbstractMatrix)
+
+Entanglement of formation for two qubits in the mixed state `rho` in the
+standard basis.
+
+Ref: Wootters, W. K. (1998). Entanglement of formation of an arbitrary state of
+two qubits. Physical Review Letters, 80(10), 2245.
+"""
 formation(rho::AbstractMatrix) = rho |> concurrence |> formation
 
 """
-Logarithmic negativity for a symmetric bipartition.
+    negativity(rho::AbstractMatrix)
+
+Logarithmic negativity for a symmetric bipartition of `rho`.
 
 Ref: Plenio, M. B. (2005). Logarithmic negativity: A full entanglement monotone
 that is not convex. Physical Review Letters, 95(9), 090503.
