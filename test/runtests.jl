@@ -44,6 +44,8 @@ end
 
         @test ptrace(M, 1) == ptrace(M, (2, 2), 1)
         @test ptrace(M, 2) == ptrace(M, (2, 2), 2)
+        @test ptranspose(M, 1) == ptranspose(M, (2, 2), 1)
+        @test ptranspose(M, 2) == ptranspose(M, (2, 2), 2)
 
         @test ptrace(M) == ptrace(M, (2, 2), 2)
         @test ptranspose(M) == ptranspose(M, (2, 2), 2)

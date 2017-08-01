@@ -133,11 +133,11 @@ function ptranspose(rho::AbstractMatrix, dims, which::Int)
     result
 end
 
-function ptranspose(rho::AbstractMatrix)
+function ptranspose(rho::AbstractMatrix, which::Int=2)
     size(rho, 1) % 2 == 0 || throw(DomainError())
 
     s = div(size(rho, 1), 2)
-    ptranspose(rho, (s, s), 2)
+    ptranspose(rho, (s, s), which)
 end
 
 """
