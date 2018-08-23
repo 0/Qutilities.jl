@@ -1,27 +1,29 @@
 using Qutilities
-using Base.Test
+using Test
+
+using LinearAlgebra: diagm, I, tr
 
 @testset "Qutilities" begin
 
 @testset "sigma_x, sigma_y, sigma_z" begin
-    @test sigma_x^2 == eye(2)
-    @test sigma_y^2 == eye(2)
-    @test sigma_z^2 == eye(2)
-    @test -im*sigma_x*sigma_y*sigma_z == eye(2)
+    @test sigma_x^2 == I
+    @test sigma_y^2 == I
+    @test sigma_z^2 == I
+    @test -im*sigma_x*sigma_y*sigma_z == I
 end
 
 @testset "ptrace, ptranspose" begin
-    let A = eye(Int, 2),
+    let A = Matrix{Int}(I, 2, 2),
         B = reshape(1:16, 4, 4),
         C = [[0, 0, 1] [0, 1, 0] [1, 0, 0]],
         ABC = kron(A, B, C),
         dims = (2, 4, 3)
 
-        @test ptrace(ABC, dims, 1) == trace(A) * kron(B, C)
+        @test ptrace(ABC, dims, 1) == tr(A) * kron(B, C)
         @test ptranspose(ABC, dims, 1) == kron(A', B, C)
-        @test ptrace(ABC, dims, 2) == trace(B) * kron(A, C)
+        @test ptrace(ABC, dims, 2) == tr(B) * kron(A, C)
         @test ptranspose(ABC, dims, 2) == kron(A, B', C)
-        @test ptrace(ABC, dims, 3) == trace(C) * kron(A, B)
+        @test ptrace(ABC, dims, 3) == tr(C) * kron(A, B)
         @test ptranspose(ABC, dims, 3) == kron(A, B, C')
     end
 
@@ -31,13 +33,13 @@ end
 
         @test ptrace(M, (1, 4), 1) == M
         @test ptranspose(M, (1, 4), 1) == M
-        @test ptrace(M, (1, 4), 2) == fill(trace(M), 1, 1)
+        @test ptrace(M, (1, 4), 2) == fill(tr(M), 1, 1)
         @test ptranspose(M, (1, 4), 2) == transpose(M)
         @test ptrace(M, (2, 2), 1) == [[12.0, 14.0] [20.0, 22.0]]
         @test ptranspose(M, (2, 2), 1) == MT1
         @test ptrace(M, (2, 2), 2) == [[7.0, 11.0] [23.0, 27.0]]
         @test ptranspose(M, (2, 2), 2) == MT2
-        @test ptrace(M, (4, 1), 1) == fill(trace(M), 1, 1)
+        @test ptrace(M, (4, 1), 1) == fill(tr(M), 1, 1)
         @test ptranspose(M, (4, 1), 1) == transpose(M)
         @test ptrace(M, (4, 1), 2) == M
         @test ptranspose(M, (4, 1), 2) == M
@@ -55,7 +57,7 @@ end
 
         @test ptrace(M, (1, 2), 1) == M
         @test ptranspose(M, (1, 2), 1) == M
-        @test ptrace(M, (1, 2), 2) == fill(trace(M), 1, 1)
+        @test ptrace(M, (1, 2), 2) == fill(tr(M), 1, 1)
         @test ptranspose(M, (1, 2), 2) == transpose(M)
     end
 end
@@ -67,7 +69,7 @@ end
 end
 
 @testset "purity, S_vn, S_renyi" begin
-    let rho1 = eye(4) / 4.0,
+    let rho1 = Matrix{Float64}(I, 4, 4) / 4.0,
         rho2 = [[2.0, im] [-im, 2.0]] / 2.0,
         eigs2 = [1.0, 3.0] / 2.0
 
@@ -89,7 +91,7 @@ end
 end
 
 @testset "mutinf" begin
-    let rho = diagm([3, 2, 1, 2]) / 8.0
+    let rho = diagm(0 => [3, 2, 1, 2]) / 8.0
 
         @test isapprox(mutinf(rho), (1.5 - 5.0 * log2(5.0) / 8.0))
         @test isapprox(mutinf(rho, S_renyi), (1.0 + 2.0 * log2(3.0) - log2(17.0)))
@@ -155,7 +157,7 @@ end
         end
     end
 
-    let rho = Matrix{Complex128}(4, 4)
+    let rho = Matrix{ComplexF64}(undef, 4, 4)
 
         for i in 1:4
             for j in 1:4

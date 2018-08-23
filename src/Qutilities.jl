@@ -1,5 +1,7 @@
 module Qutilities
 
+using LinearAlgebra: eigvals, Hermitian, svdvals, tr
+
 export
     binent,
     concurrence,
@@ -27,12 +29,11 @@ const LOG = log2
 Make `rho` Hermitian, but carefully.
 """
 function hermitize(rho::AbstractMatrix)
-    # Only square matrices are supported.
-    size(rho, 1) == size(rho, 2) || throw(DomainError())
+    size(rho, 1) == size(rho, 2) || throw(DomainError(size(rho), "Only square matrices are supported."))
 
     err = maximum(abs.(rho - rho'))
     if err > 1e-12
-        warn("Matrix is not Hermitian: $(err)")
+        @warn "Matrix is not Hermitian: $(err)"
     end
 
     # Make the diagonal strictly real.
@@ -65,13 +66,12 @@ const sigma_y = [[0.0, im] [-im, 0.0]]
 const sigma_z = [[1.0, 0.0] [0.0, -1.0]]
 
 """
-    ptrace{T}(rho::AbstractMatrix{T}, dims, which::Int)
+    ptrace(rho::AbstractMatrix{T}, dims, which::Int)
 
 Partial trace of `rho` along dimension `which` from `dims`.
 """
-function ptrace{T}(rho::AbstractMatrix{T}, dims, which::Int)
-    # Only square matrices are supported.
-    size(rho) == (prod(dims), prod(dims)) || throw(DomainError())
+function ptrace(rho::AbstractMatrix{T}, dims, which::Int) where {T}
+    size(rho) == (prod(dims), prod(dims)) || throw(DomainError(size(rho), "Only square matrices are supported."))
 
     size_before = prod(dims[1:(which-1)])
     size_at = dims[which]
@@ -104,7 +104,7 @@ Partial trace of `rho` along dimension `which`.
 `rho` is split into halves and the trace is over the second half by default.
 """
 function ptrace(rho::AbstractMatrix, which::Int=2)
-    size(rho, 1) % 2 == 0 || throw(DomainError())
+    size(rho, 1) % 2 == 0 || throw(DomainError(size(rho, 1), "Matrix size must be even."))
 
     s = div(size(rho, 1), 2)
     ptrace(rho, (s, s), which)
@@ -116,8 +116,7 @@ end
 Partial transpose of `rho` along dimension `which` from `dims`.
 """
 function ptranspose(rho::AbstractMatrix, dims, which::Int)
-    # Only square matrices are supported.
-    size(rho) == (prod(dims), prod(dims)) || throw(DomainError())
+    size(rho) == (prod(dims), prod(dims)) || throw(DomainError(size(rho), "Only square matrices are supported."))
 
     size_before = prod(dims[1:(which-1)])
     size_at = dims[which]
@@ -153,7 +152,7 @@ Partial transpose of `rho` along dimension `which`.
 default.
 """
 function ptranspose(rho::AbstractMatrix, which::Int=2)
-    size(rho, 1) % 2 == 0 || throw(DomainError())
+    size(rho, 1) % 2 == 0 || throw(DomainError(size(rho, 1), "Matrix size must be even."))
 
     s = div(size(rho, 1), 2)
     ptranspose(rho, (s, s), which)
@@ -171,7 +170,7 @@ binent(x::Real) = shannon([x, one(x) - x])
 
 Purity of `rho`.
 """
-purity(rho::AbstractMatrix) = rho^2 |> trace |> real
+purity(rho::AbstractMatrix) = rho^2 |> tr |> real
 
 """
     S_vn(rho::AbstractMatrix)
@@ -213,7 +212,7 @@ Ref: Wootters, W. K. (1998). Entanglement of formation of an arbitrary state of
 two qubits. Physical Review Letters, 80(10), 2245.
 """
 function spinflip(rho::AbstractMatrix)
-    size(rho) == (4, 4) || throw(DomainError())
+    size(rho) == (4, 4) || throw(DomainError(size(rho), "Matrix must be 4 by 4."))
 
     Y = kron(sigma_y, sigma_y)
     Y * conj(rho) * Y
@@ -228,14 +227,14 @@ Ref: Wootters, W. K. (1998). Entanglement of formation of an arbitrary state of
 two qubits. Physical Review Letters, 80(10), 2245.
 """
 function concurrence(rho::AbstractMatrix)
-    size(rho) == (4, 4) || throw(DomainError())
+    size(rho) == (4, 4) || throw(DomainError(size(rho), "Matrix must be 4 by 4."))
 
     E = rho * spinflip(rho) |> eigvals
     if any(imag(E) .> 1e-15)
-        warn("Complex eigenvalues: $(maximum(imag(E)))")
+        @warn "Complex eigenvalues: $(maximum(imag(E)))"
     end
     if any(real(E) .< -1e-12)
-        warn("Negative eigenvalues: $(minimum(real(E)))")
+        @warn "Negative eigenvalues: $(minimum(real(E)))"
     end
     F = sort(sqrt.(nonneg.(real(E))))
     nonneg(F[end] - sum(F[1:(end-1)]))
@@ -251,7 +250,7 @@ Ref: Mintert, F., & Buchleitner, A. (2007). Observable entanglement measure for
 mixed quantum states. Physical Review Letters, 98(14), 140505.
 """
 function concurrence_lb(rho::AbstractMatrix)
-    size(rho) == (4, 4) || throw(DomainError())
+    size(rho) == (4, 4) || throw(DomainError(size(rho), "Matrix must be 4 by 4."))
 
     2.0*(purity(rho) - purity(ptrace(rho))) |> nonneg |> sqrt
 end

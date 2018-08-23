@@ -1,13 +1,15 @@
-# Qutilities.jl
+# Qutilities
 
 Assorted utilities for quantum information.
 
-Tested with Julia 0.6.
+Tested with Julia 1.0.
 
 
 ## Installation
 
-1. `Pkg.clone("https://github.com/0/Qutilities.jl.git")`
+```
+pkg> add https://github.com/0/Qutilities.jl.git
+```
 
 
 ## Examples
@@ -58,9 +60,10 @@ julia> negativity(rho)
 
 ## Testing
 
-Run all the tests:
+To run all the tests, activate the package before calling `test`:
 ```
-JULIA_LOAD_PATH=src julia --color=yes test/runtests.jl
+pkg> activate .
+(Qutilities) pkg> test
 ```
 
 
