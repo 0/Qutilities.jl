@@ -8,7 +8,7 @@ Tested with Julia 1.0.
 ## Installation
 
 ```
-pkg> add https://github.com/0/Qutilities.jl.git
+pkg> add Qutilities
 ```
 
 
