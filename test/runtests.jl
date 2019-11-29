@@ -13,7 +13,7 @@ using LinearAlgebra: diagm, I, tr
 end
 
 @testset "ptrace, ptranspose" begin
-    let A = Matrix{Int}(I, 2, 2),
+    let A = I(2),
         B = reshape(1:16, 4, 4),
         C = [[0, 0, 1] [0, 1, 0] [1, 0, 0]],
         ABC = kron(A, B, C),
@@ -69,7 +69,7 @@ end
 end
 
 @testset "purity, S_vn, S_renyi" begin
-    let rho1 = Matrix{Float64}(I, 4, 4) / 4.0,
+    let rho1 = I(4) / 4.0,
         rho2 = [[2.0, im] [-im, 2.0]] / 2.0,
         eigs2 = [1.0, 3.0] / 2.0
 
@@ -91,7 +91,7 @@ end
 end
 
 @testset "mutinf" begin
-    let rho = diagm(0 => [3, 2, 1, 2]) / 8.0
+    let rho = diagm([3, 2, 1, 2]) / 8.0
 
         @test isapprox(mutinf(rho), (1.5 - 5.0 * log2(5.0) / 8.0))
         @test isapprox(mutinf(rho, S_renyi), (1.0 + 2.0 * log2(3.0) - log2(17.0)))

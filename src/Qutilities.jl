@@ -1,6 +1,6 @@
 module Qutilities
 
-using LinearAlgebra: eigvals, Hermitian, svdvals, tr
+using LinearAlgebra: Diagonal, eigvals, Hermitian, svdvals, tr
 
 export
     binent,
@@ -44,6 +44,8 @@ function hermitize(rho::AbstractMatrix)
 
     Hermitian(rho_H)
 end
+
+hermitize(rho::Diagonal) = rho
 
 """
     nonneg(x::Real)

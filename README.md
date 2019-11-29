@@ -2,7 +2,7 @@
 
 Assorted utilities for quantum information.
 
-Tested with Julia 1.0.
+Tested with Julia 1.3.
 
 
 ## Installation
